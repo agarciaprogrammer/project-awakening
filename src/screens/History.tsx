@@ -82,9 +82,9 @@ export function History() {
       <Panel title="Records">
         <div className="metrics">
           <div><span>{m.strengthSessions}</span>Strength sessions</div>
-          <div><span>{m.treadmillSessions}</span>Treadmill sessions</div>
-          <div><span>{Math.round(m.treadmillMinutes)}</span>Minutes walked</div>
-          <div><span>{m.treadmillKm.toFixed(2)}</span>Km walked</div>
+          <div><span>{m.treadmillSessions}</span>Endurance sessions</div>
+          <div><span>{Math.round(m.treadmillMinutes)}</span>Minutes of cardio</div>
+          <div><span>{m.treadmillKm.toFixed(2)}</span>Km covered</div>
           <div><span>{m.sessionsThisWeek}</span>Sessions this week</div>
           <div><span>{m.totalSets}</span>Sets completed</div>
         </div>
@@ -102,7 +102,7 @@ export function History() {
                   <Icon name={s.type === 'strength' ? 'fist' : 'boot'} />
                 </span>
                 <span className="log__main">
-                  <strong>{s.type === 'strength' ? s.routineName : 'Treadmill'}</strong>
+                  <strong>{s.type === 'strength' ? s.routineName : 'Endurance'}</strong>
                   <span className="muted small">{formatDateTime(s.endedAt)}</span>
                   <span className="small">
                     {formatDurationShort(s.durationSec)} ·{' '}
@@ -120,7 +120,7 @@ export function History() {
         </ul>
       )}
 
-      <Sheet open={open !== null} onClose={() => setOpenId(null)} title={open ? (open.type === 'strength' ? open.routineName : 'Treadmill walk') : ''}>
+      <Sheet open={open !== null} onClose={() => setOpenId(null)} title={open ? (open.type === 'strength' ? open.routineName : 'Endurance session') : ''}>
         {open && <SessionDetail session={open} onDelete={() => setDeleteId(open.id)} />}
       </Sheet>
       <Confirm

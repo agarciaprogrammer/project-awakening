@@ -51,7 +51,7 @@ export function Result({ sessionId, beforeXp, onDone }: { sessionId: string; bef
 
       <dl className="summary">
         <dt>Activity</dt>
-        <dd>{session.type === 'strength' ? session.routineName : 'Treadmill walk'}</dd>
+        <dd>{session.type === 'strength' ? session.routineName : 'Endurance session'}</dd>
         <dt>Duration</dt>
         <dd>{formatClock(session.durationSec)}</dd>
         {session.type === 'strength' ? (

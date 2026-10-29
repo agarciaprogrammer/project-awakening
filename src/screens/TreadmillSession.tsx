@@ -47,7 +47,7 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
   const after = progressFromXp(before.totalXp + xp);
 
   const save = () => {
-    if (durationSec <= 0) return setError('Enter how long you walked.');
+    if (durationSec <= 0) return setError('Enter how long the session lasted.');
     if (parseInt(sec || '0', 10) > 59) return setError('Seconds must be 0–59.');
     if (kmParsed === 'invalid') return setError('Distance must be a number like 3.56');
     setError(null);
@@ -61,7 +61,7 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
         <button type="button" className="btn btn--ghost btn--sm" onClick={onBack}>
           ‹ Home
         </button>
-        <span className="eyebrow">Treadmill</span>
+        <span className="eyebrow">Endurance</span>
         <button type="button" className="btn btn--ghost btn--sm btn--danger-text" onClick={() => setConfirmCancel(true)}>
           Cancel
         </button>
@@ -78,7 +78,7 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
           </p>
           <p className="muted center">+{treadmillXp(elapsed)} XP so far · 1 XP per minute, max 50</p>
           <button type="button" className="btn btn--primary btn--lg btn--block" onClick={() => stop(false)}>
-            FINISH WALK
+            FINISH SESSION
           </button>
           <button type="button" className="btn btn--ghost btn--block" onClick={() => stop(true)}>
             Forgot the timer? Log manually
@@ -92,7 +92,7 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
             save();
           }}
         >
-          <h2 className="section-title">Log your walk</h2>
+          <h2 className="section-title">Log your session</h2>
           <label className="field">
             <span className="field__label">Duration</span>
             <span className="duration">
@@ -124,7 +124,7 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
           </dl>
           {error && <p className="warn" role="alert">{error}</p>}
           <button type="submit" className="btn btn--primary btn--lg btn--block">
-            SAVE WALK
+            SAVE SESSION
           </button>
           <button type="button" className="btn btn--ghost btn--block" onClick={() => dispatch({ type: 'RESUME_TREADMILL' })}>
             Back to timer
@@ -135,8 +135,8 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
       <Confirm
         open={confirmCancel}
         danger
-        title="Abandon walk?"
-        body="This walk will be discarded and won’t appear in your history."
+        title="Abandon session?"
+        body="This session will be discarded and won’t appear in your history."
         confirmLabel="Discard"
         onCancel={() => setConfirmCancel(false)}
         onConfirm={() => {

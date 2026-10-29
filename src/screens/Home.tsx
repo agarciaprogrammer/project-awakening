@@ -59,7 +59,7 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
         <button type="button" className="train-btn train-btn--resume" onClick={onResume}>
           <span className="train-btn__label">RESUME</span>
           <span className="train-btn__sub">
-            {active.type === 'strength' ? 'Strength' : 'Treadmill'} in progress ·{' '}
+            {active.type === 'strength' ? 'Strength' : 'Endurance'} in progress ·{' '}
             {formatClock(((active.type === 'treadmill' && active.stoppedAt ? active.stoppedAt : now) - active.startedAt) / 1000)}
           </span>
         </button>
@@ -103,7 +103,7 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
       <Panel title="Attributes">
         <div className="stats-row">
           <StatPips label="STR" value={stats.str} hint="Strength: grows with strength-session XP" />
-          <StatPips label="END" value={stats.end} hint="Endurance: grows with treadmill minutes" />
+          <StatPips label="END" value={stats.end} hint="Endurance: grows with endurance minutes" />
           <StatPips label="VIT" value={stats.vit} hint="Vitality: grows with the number of days you train" />
         </div>
         <p className="muted small">
@@ -135,7 +135,7 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
           >
             <Icon name="boot" />
             <span className="picker__name">ENDURANCE</span>
-            <span className="picker__desc">Treadmill walk · distance</span>
+            <span className="picker__desc">Treadmill · walk or run</span>
           </button>
         </div>
       </Sheet>

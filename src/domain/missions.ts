@@ -28,7 +28,7 @@ export function computeMissions(sessions: WorkoutSession[], settings: UserSettin
     : {
         id: 'daily',
         title: 'Daily training',
-        description: 'Complete one strength or treadmill session today.',
+        description: 'Complete one strength or endurance session today.',
         progress: Math.min(1, doneToday),
         target: 1,
         completed: doneToday > 0,
