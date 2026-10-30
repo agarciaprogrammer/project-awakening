@@ -1,4 +1,4 @@
-import { formatClock } from '../domain/dates';
+import { formatClock, formatNumber } from '../domain/dates';
 import { completedExerciseCount, completedSetCount, computeProgress, progressFromXp, sessionXp } from '../domain/progression';
 import { unlocksBetween } from '../domain/unlocks';
 import { Hero } from '../components/Hero';
@@ -13,9 +13,9 @@ export function Result({ sessionId, beforeXp, onDone }: { sessionId: string; bef
   if (!session) {
     return (
       <div className="screen result">
-        <p className="empty">Session not found.</p>
+        <p className="empty">Sesión no encontrada.</p>
         <button type="button" className="btn btn--primary btn--block" onClick={onDone}>
-          Continue
+          Continuar
         </button>
       </div>
     );
@@ -28,14 +28,14 @@ export function Result({ sessionId, beforeXp, onDone }: { sessionId: string; bef
     <div className={`screen result ${leveled ? 'result--levelup' : ''}`}>
       {leveled ? (
         <div className="levelup" role="status">
-          <p className="levelup__flash">LEVEL UP</p>
+          <p className="levelup__flash">¡SUBISTE DE NIVEL!</p>
           <p className="levelup__lv">
             LV {before.level} → <strong>{after.level}</strong>
           </p>
         </div>
       ) : (
         <p className="result__head" role="status">
-          SESSION COMPLETE
+          SESIÓN COMPLETADA
         </p>
       )}
 
@@ -50,28 +50,28 @@ export function Result({ sessionId, beforeXp, onDone }: { sessionId: string; bef
       </p>
 
       <dl className="summary">
-        <dt>Activity</dt>
-        <dd>{session.type === 'strength' ? session.routineName : 'Endurance session'}</dd>
-        <dt>Duration</dt>
+        <dt>Actividad</dt>
+        <dd>{session.type === 'strength' ? session.routineName : 'Sesión de resistencia'}</dd>
+        <dt>Duración</dt>
         <dd>{formatClock(session.durationSec)}</dd>
         {session.type === 'strength' ? (
           <>
-            <dt>Exercises completed</dt>
+            <dt>Ejercicios completados</dt>
             <dd>{completedExerciseCount(session.exercises)}</dd>
-            <dt>Sets completed</dt>
+            <dt>Series completadas</dt>
             <dd>{completedSetCount(session.exercises)}</dd>
           </>
         ) : (
           <>
-            <dt>Distance</dt>
-            <dd>{session.treadmill.distanceKm != null ? `${session.treadmill.distanceKm} km` : '—'}</dd>
+            <dt>Distancia</dt>
+            <dd>{session.treadmill.distanceKm != null ? `${formatNumber(session.treadmill.distanceKm)} km` : '—'}</dd>
           </>
         )}
       </dl>
 
       {unlocks.length > 0 && (
         <div className="unlocks">
-          <p className="eyebrow">Unlocked</p>
+          <p className="eyebrow">Desbloqueado</p>
           {unlocks.map((u) => (
             <div key={u.name} className="unlock">
               <strong>{u.name}</strong>
@@ -82,7 +82,7 @@ export function Result({ sessionId, beforeXp, onDone }: { sessionId: string; bef
       )}
 
       <button type="button" className="btn btn--primary btn--lg btn--block" onClick={onDone}>
-        CONTINUE
+        CONTINUAR
       </button>
     </div>
   );

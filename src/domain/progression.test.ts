@@ -22,10 +22,10 @@ describe('xp rules', () => {
     expect(treadmillXp(120 * 60)).toBe(50);
   });
   it('level curve', () => {
-    expect([1, 2, 3, 4].map(xpForNextLevel)).toEqual([100, 120, 140, 160]);
-    expect(progressFromXp(0)).toMatchObject({ level: 1, xpInLevel: 0, xpForNext: 100 });
-    expect(progressFromXp(100)).toMatchObject({ level: 2, xpInLevel: 0 });
-    expect(progressFromXp(230)).toMatchObject({ level: 3, xpInLevel: 10 });
+    expect([1, 2, 3, 4].map(xpForNextLevel)).toEqual([40, 52, 57, 61]);
+    expect(progressFromXp(0)).toMatchObject({ level: 1, xpInLevel: 0, xpForNext: 40 });
+    expect(progressFromXp(40)).toMatchObject({ level: 2, xpInLevel: 0 });
+    expect(progressFromXp(102)).toMatchObject({ level: 3, xpInLevel: 10 });
     expect(progressFromXp(1_000_000).level).toBeGreaterThan(20);
   });
 });

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatDate, formatDateTime, formatDurationShort } from '../domain/dates';
+import { formatDate, formatDateTime, formatDurationShort, formatNumber } from '../domain/dates';
 import { completedSetCount, computeProgress, sessionXp } from '../domain/progression';
 import { computeMetrics } from '../domain/stats';
 import type { WorkoutSession } from '../domain/types';
@@ -18,25 +18,25 @@ function SessionDetail({ session, onDelete }: { session: WorkoutSession; onDelet
   return (
     <>
       <dl className="summary">
-        <dt>Date</dt>
+        <dt>Fecha</dt>
         <dd>{formatDateTime(session.endedAt)}</dd>
-        <dt>Duration</dt>
+        <dt>Duración</dt>
         <dd>{formatDurationShort(session.durationSec)}</dd>
         <dt>XP</dt>
         <dd className="accent">+{sessionXp(session)}</dd>
         {session.type === 'treadmill' && (
           <>
-            <dt>Distance</dt>
-            <dd>{session.treadmill.distanceKm != null ? `${session.treadmill.distanceKm} km` : '—'}</dd>
-            <dt>Avg speed</dt>
-            <dd>{speed ? `${speed.toFixed(2)} km/h` : '—'}</dd>
+            <dt>Distancia</dt>
+            <dd>{session.treadmill.distanceKm != null ? `${formatNumber(session.treadmill.distanceKm)} km` : '—'}</dd>
+            <dt>Velocidad media</dt>
+            <dd>{speed ? `${formatNumber(speed)} km/h` : '—'}</dd>
           </>
         )}
       </dl>
       {session.type === 'treadmill' && session.treadmill.note && <p className="note">“{session.treadmill.note}”</p>}
       {session.type === 'strength' &&
         (session.exercises.length === 0 ? (
-          <p className="muted">No sets were completed in this session.</p>
+          <p className="muted">No se completaron series en esta sesión.</p>
         ) : (
           <ul className="detail-ex">
             {session.exercises.map((e) => (
@@ -47,14 +47,14 @@ function SessionDetail({ session, onDelete }: { session: WorkoutSession; onDelet
                     .filter((s) => s.completed)
                     .map((s) => `${s.value}${e.mode === 'seconds' ? 's' : ''}`)
                     .join(' · ')}
-                  {e.perSide ? ' / side' : ''}
+                  {e.perSide ? ' / lado' : ''}
                 </span>
               </li>
             ))}
           </ul>
         ))}
       <button type="button" className="btn btn--ghost btn--danger-text btn--block" onClick={onDelete}>
-        <Icon name="trash" /> Delete session
+        <Icon name="trash" /> Eliminar sesión
       </button>
     </>
   );
@@ -73,26 +73,26 @@ export function History() {
     <div className="screen history">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Chronicle</p>
-          <h1 className="logo">HISTORY</h1>
+          <p className="eyebrow">Crónica</p>
+          <h1 className="logo">HISTORIAL</h1>
         </div>
         <span className="tag tag--gold">LV {level}</span>
       </header>
 
-      <Panel title="Records">
+      <Panel title="Registros">
         <div className="metrics">
-          <div><span>{m.strengthSessions}</span>Strength sessions</div>
-          <div><span>{m.treadmillSessions}</span>Endurance sessions</div>
-          <div><span>{Math.round(m.treadmillMinutes)}</span>Minutes of cardio</div>
-          <div><span>{m.treadmillKm.toFixed(2)}</span>Km covered</div>
-          <div><span>{m.sessionsThisWeek}</span>Sessions this week</div>
-          <div><span>{m.totalSets}</span>Sets completed</div>
+          <div><span>{m.strengthSessions}</span>Sesiones de fuerza</div>
+          <div><span>{m.treadmillSessions}</span>Sesiones de resistencia</div>
+          <div><span>{Math.round(m.treadmillMinutes)}</span>Minutos de cardio</div>
+          <div><span>{formatNumber(m.treadmillKm)}</span>Km recorridos</div>
+          <div><span>{m.sessionsThisWeek}</span>Sesiones esta semana</div>
+          <div><span>{m.totalSets}</span>Series completadas</div>
         </div>
-        <p className="muted small">{m.lastActivityAt ? `Last activity: ${formatDate(m.lastActivityAt)}` : 'No activity recorded yet.'}</p>
+        <p className="muted small">{m.lastActivityAt ? `Última actividad: ${formatDate(m.lastActivityAt)}` : 'Todavía no hay actividad registrada.'}</p>
       </Panel>
 
       {state.sessions.length === 0 ? (
-        <p className="empty">Your chronicle is empty. Tap TRAIN on the Home screen to write the first entry.</p>
+        <p className="empty">Tu crónica está vacía. Tocá ENTRENAR en Inicio para escribir la primera entrada.</p>
       ) : (
         <ul className="log">
           {state.sessions.map((s) => (
@@ -102,15 +102,15 @@ export function History() {
                   <Icon name={s.type === 'strength' ? 'fist' : 'boot'} />
                 </span>
                 <span className="log__main">
-                  <strong>{s.type === 'strength' ? s.routineName : 'Endurance'}</strong>
+                  <strong>{s.type === 'strength' ? s.routineName : 'Resistencia'}</strong>
                   <span className="muted small">{formatDateTime(s.endedAt)}</span>
                   <span className="small">
                     {formatDurationShort(s.durationSec)} ·{' '}
                     {s.type === 'strength'
-                      ? `${s.exercises.length} exercises · ${completedSetCount(s.exercises)} sets`
+                      ? `${s.exercises.length} ejercicios · ${completedSetCount(s.exercises)} series`
                       : s.treadmill.distanceKm != null
-                        ? `${s.treadmill.distanceKm} km`
-                        : 'no distance'}
+                        ? `${formatNumber(s.treadmill.distanceKm)} km`
+                        : 'sin distancia'}
                   </span>
                 </span>
                 <span className="log__xp">+{sessionXp(s)}</span>
@@ -120,15 +120,15 @@ export function History() {
         </ul>
       )}
 
-      <Sheet open={open !== null} onClose={() => setOpenId(null)} title={open ? (open.type === 'strength' ? open.routineName : 'Endurance session') : ''}>
+      <Sheet open={open !== null} onClose={() => setOpenId(null)} title={open ? (open.type === 'strength' ? open.routineName : 'Sesión de resistencia') : ''}>
         {open && <SessionDetail session={open} onDelete={() => setDeleteId(open.id)} />}
       </Sheet>
       <Confirm
         open={deleteId !== null}
         danger
-        title="Delete this session?"
-        body="Its XP will be removed and your level, map and stats recalculated. This can’t be undone."
-        confirmLabel="Delete"
+        title="¿Eliminar esta sesión?"
+        body="Se quitará su XP y se recalcularán tu nivel, el mapa y las estadísticas. No se puede deshacer."
+        confirmLabel="Eliminar"
         onCancel={() => setDeleteId(null)}
         onConfirm={() => {
           if (deleteId) dispatch({ type: 'DELETE_SESSION', id: deleteId });

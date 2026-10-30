@@ -18,8 +18,8 @@ npm test           # progression / reducer unit tests
 ## Rules
 - Strength XP = `min(50, 15 + 5 × exercises with ≥1 completed set)`; 0 if nothing completed.
 - Treadmill XP = `min(50, floor(seconds / 60))`.
-- Level `n → n+1` needs `100 + 20 × (n − 1)` XP. Progress is always derived from saved sessions.
-- STR = 1 + ⌊strength XP / 40⌋ · END = 1 + ⌊treadmill minutes / 30⌋ · VIT = 1 + ⌊distinct training days / 3⌋.
+- Level `n → n+1` needs `round(40 + 12 × √(n − 1))` XP (no cap). 15 designed zones × 10 levels = LV 150, then endless "Eco" cycles. Progress is always derived from saved sessions.
+- Atributos (cada uno con su propio nivel, costo del nivel n → n+1 = paso × n): Fuerza = series completadas (paso 10), Resistencia = minutos de cardio (paso 30), Constancia = días distintos con sesión (paso 3).
 - Rest days (default Mon & Wed) never cost anything.
 
 `npm run icons` regenerates the PNG app icons.

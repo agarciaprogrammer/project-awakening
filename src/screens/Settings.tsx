@@ -58,9 +58,9 @@ function RoutineEditor() {
   };
 
   return (
-    <Panel title="Strength routine">
+    <Panel title="Rutina de fuerza">
       <label className="field">
-        <span className="field__label">Routine name</span>
+        <span className="field__label">Nombre de la rutina</span>
         <input
           className="input"
           value={nameDraft}
@@ -74,42 +74,42 @@ function RoutineEditor() {
         />
       </label>
 
-      {routine.exercises.length === 0 && <p className="empty">No exercises yet. Add one below.</p>}
+      {routine.exercises.length === 0 && <p className="empty">Todavía no hay ejercicios. Agregá uno abajo.</p>}
       <ol className="rx-list">
         {routine.exercises.map((rx, i) => (
           <li key={rx.id} className="rx">
             <div className="rx__head">
               <span className="exercise__num">{i + 1}</span>
               <strong className="rx__name">{nameOf(rx.exerciseId)}</strong>
-              <IconButton icon="up" label="Move up" onClick={() => move(i, -1)} className="icon-btn--sm" />
-              <IconButton icon="down" label="Move down" onClick={() => move(i, 1)} className="icon-btn--sm" />
-              <IconButton icon="trash" label="Remove from routine" onClick={() => setRemoveId(rx.id)} className="icon-btn--sm icon-btn--danger" />
+              <IconButton icon="up" label="Subir" onClick={() => move(i, -1)} className="icon-btn--sm" />
+              <IconButton icon="down" label="Bajar" onClick={() => move(i, 1)} className="icon-btn--sm" />
+              <IconButton icon="trash" label="Quitar de la rutina" onClick={() => setRemoveId(rx.id)} className="icon-btn--sm icon-btn--danger" />
             </div>
             <div className="rx__grid">
               <label>
-                <span className="field__label">Sets</span>
-                <NumField label="Sets" value={rx.sets} min={1} max={10} onCommit={(n) => patch(rx.id, { sets: n })} />
+                <span className="field__label">Series</span>
+                <NumField label="Series" value={rx.sets} min={1} max={10} onCommit={(n) => patch(rx.id, { sets: n })} />
               </label>
               <label>
-                <span className="field__label">Min</span>
-                <NumField label="Target minimum" value={rx.targetMin} min={1} max={999} onCommit={(n) => patch(rx.id, { targetMin: n, targetMax: Math.max(n, rx.targetMax) })} />
+                <span className="field__label">Mín</span>
+                <NumField label="Objetivo mínimo" value={rx.targetMin} min={1} max={999} onCommit={(n) => patch(rx.id, { targetMin: n, targetMax: Math.max(n, rx.targetMax) })} />
               </label>
               <label>
-                <span className="field__label">Max</span>
-                <NumField label="Target maximum" value={rx.targetMax} min={1} max={999} onCommit={(n) => patch(rx.id, { targetMax: n, targetMin: Math.min(n, rx.targetMin) })} />
+                <span className="field__label">Máx</span>
+                <NumField label="Objetivo máximo" value={rx.targetMax} min={1} max={999} onCommit={(n) => patch(rx.id, { targetMax: n, targetMin: Math.min(n, rx.targetMin) })} />
               </label>
             </div>
             <div className="rx__toggles">
-              <div className="seg" role="group" aria-label="Measure">
+              <div className="seg" role="group" aria-label="Medida">
                 <button type="button" className={rx.mode === 'reps' ? 'seg__on' : ''} aria-pressed={rx.mode === 'reps'} onClick={() => patch(rx.id, { mode: 'reps' })}>
                   Reps
                 </button>
                 <button type="button" className={rx.mode === 'seconds' ? 'seg__on' : ''} aria-pressed={rx.mode === 'seconds'} onClick={() => patch(rx.id, { mode: 'seconds' })}>
-                  Seconds
+                  Segundos
                 </button>
               </div>
               <label className="check-label">
-                <input type="checkbox" checked={rx.perSide} onChange={(e) => patch(rx.id, { perSide: e.target.checked })} /> Per side
+                <input type="checkbox" checked={rx.perSide} onChange={(e) => patch(rx.id, { perSide: e.target.checked })} /> Por lado
               </label>
             </div>
           </li>
@@ -117,12 +117,12 @@ function RoutineEditor() {
       </ol>
 
       <div className="add-row">
-        <select className="input" value={addId} onChange={(e) => setAddId(e.target.value)} aria-label="Exercise to add">
-          <option value="">Add from catalog…</option>
+        <select className="input" value={addId} onChange={(e) => setAddId(e.target.value)} aria-label="Ejercicio a agregar">
+          <option value="">Agregar del catálogo…</option>
           {available.map((e) => (
             <option key={e.id} value={e.id}>
               {e.name}
-              {e.custom ? ' (custom)' : ''}
+              {e.custom ? ' (personalizado)' : ''}
             </option>
           ))}
         </select>
@@ -135,37 +135,37 @@ function RoutineEditor() {
             setAddId('');
           }}
         >
-          Add
+          Agregar
         </button>
       </div>
 
       <div className="custom">
-        <p className="field__label">Create custom exercise</p>
-        <input className="input" placeholder="Exercise name" value={customName} maxLength={60} onChange={(e) => setCustomName(e.target.value)} />
+        <p className="field__label">Crear ejercicio personalizado</p>
+        <input className="input" placeholder="Nombre del ejercicio" value={customName} maxLength={60} onChange={(e) => setCustomName(e.target.value)} />
         <div className="rx__toggles">
-          <div className="seg" role="group" aria-label="Measure">
+          <div className="seg" role="group" aria-label="Medida">
             <button type="button" className={customMode === 'reps' ? 'seg__on' : ''} aria-pressed={customMode === 'reps'} onClick={() => setCustomMode('reps')}>
               Reps
             </button>
             <button type="button" className={customMode === 'seconds' ? 'seg__on' : ''} aria-pressed={customMode === 'seconds'} onClick={() => setCustomMode('seconds')}>
-              Seconds
+              Segundos
             </button>
           </div>
           <label className="check-label">
-            <input type="checkbox" checked={customSide} onChange={(e) => setCustomSide(e.target.checked)} /> Per side
+            <input type="checkbox" checked={customSide} onChange={(e) => setCustomSide(e.target.checked)} /> Por lado
           </label>
         </div>
         <button type="button" className="btn btn--ghost btn--block" disabled={!customName.trim()} onClick={createCustom}>
-          + Create & add to routine
+          + Crear y agregar a la rutina
         </button>
       </div>
 
       <Confirm
         open={removeId !== null}
         danger
-        title="Remove exercise?"
-        body="It will be removed from the routine. Past sessions keep their records."
-        confirmLabel="Remove"
+        title="¿Quitar ejercicio?"
+        body="Se quitará de la rutina. Las sesiones anteriores conservan sus registros."
+        confirmLabel="Quitar"
         onCancel={() => setRemoveId(null)}
         onConfirm={() => {
           save({ ...routine, exercises: routine.exercises.filter((x) => x.id !== removeId) });
@@ -193,7 +193,7 @@ function Backup() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setMsg('Backup exported.');
+    setMsg('Backup exportado.');
   };
 
   const onFile = async (file: File | undefined) => {
@@ -203,57 +203,57 @@ function Backup() {
     if (result.ok) {
       setPending(result.state);
       setMsg(null);
-    } else setMsg(`Import failed: ${result.error}`);
+    } else setMsg(`Error al importar: ${result.error}`);
   };
 
   return (
-    <Panel title="Data">
-      <p className="muted small">Everything is stored on this device only. Export a backup now and then.</p>
+    <Panel title="Datos">
+      <p className="muted small">Todo se guarda solo en este dispositivo. Exportá un backup cada tanto.</p>
       <div className="btn-row">
         <button type="button" className="btn btn--ghost" onClick={doExport}>
-          Export JSON
+          Exportar JSON
         </button>
         <button type="button" className="btn btn--ghost" onClick={() => fileRef.current?.click()}>
-          Import JSON
+          Importar JSON
         </button>
       </div>
       <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => onFile(e.target.files?.[0])} />
       {msg && <p className="small" role="status">{msg}</p>}
       <button type="button" className="btn btn--ghost btn--danger-text btn--block" onClick={() => setConfirmReset(true)}>
-        Reset all data
+        Borrar todos los datos
       </button>
 
       <Confirm
         open={pending !== null}
         danger
-        title="Replace current data?"
+        title="¿Reemplazar los datos actuales?"
         body={
           pending && (
             <p>
-              The backup contains <strong>{pending.sessions.length}</strong> sessions and the routine “{pending.routines[0]?.name}”. Your current data (
-              {state.sessions.length} sessions) will be replaced.
+              El backup contiene <strong>{pending.sessions.length}</strong> sesiones y la rutina “{pending.routines[0]?.name}”. Tus datos actuales (
+              {state.sessions.length} sesiones) serán reemplazados.
             </p>
           )
         }
-        confirmLabel="Replace"
+        confirmLabel="Reemplazar"
         onCancel={() => setPending(null)}
         onConfirm={() => {
           if (pending) dispatch({ type: 'REPLACE_STATE', state: pending });
           setPending(null);
-          setMsg('Backup imported.');
+          setMsg('Backup importado.');
         }}
       />
       <Confirm
         open={confirmReset}
         danger
-        title="Reset everything?"
-        body="All sessions, progress and routine edits will be erased from this device. Export a backup first if unsure."
-        confirmLabel="Erase all"
+        title="¿Borrar todo?"
+        body="Se borrarán de este dispositivo todas las sesiones, el progreso y los cambios en la rutina. Si tenés dudas, exportá un backup antes."
+        confirmLabel="Borrar todo"
         onCancel={() => setConfirmReset(false)}
         onConfirm={() => {
           dispatch({ type: 'RESET', now: Date.now() });
           setConfirmReset(false);
-          setMsg('Data reset.');
+          setMsg('Datos borrados.');
         }}
       />
     </Panel>
@@ -273,16 +273,16 @@ export function Settings({ onClose }: { onClose: () => void }) {
     <div className="screen settings">
       <header className="topbar">
         <div>
-          <p className="eyebrow">System</p>
-          <h1 className="logo">SETTINGS</h1>
+          <p className="eyebrow">Sistema</p>
+          <h1 className="logo">AJUSTES</h1>
         </div>
-        <IconButton icon="close" label="Close settings" onClick={onClose} />
+        <IconButton icon="close" label="Cerrar ajustes" onClick={onClose} />
       </header>
 
       <RoutineEditor />
 
-      <Panel title="Rest days">
-        <p className="muted small">On rest days nothing is required and nothing is lost. You can still train if you want.</p>
+      <Panel title="Días de descanso">
+        <p className="muted small">En los días de descanso no se exige nada y no se pierde nada. Igual podés entrenar si querés.</p>
         <div className="days">
           {WEEKDAYS_MON_FIRST.map(({ day, short }) => {
             const on = state.settings.restDays.includes(day);
@@ -298,9 +298,9 @@ export function Settings({ onClose }: { onClose: () => void }) {
 
       <Backup />
 
-      <p className="muted small center">PROJECT AWAKENING · v0.1 · offline-first</p>
+      <p className="muted small center">PROJECT AWAKENING · v0.1 · funciona sin conexión</p>
       <button type="button" className="btn btn--primary btn--block" onClick={onClose}>
-        Done
+        Listo
       </button>
     </div>
   );

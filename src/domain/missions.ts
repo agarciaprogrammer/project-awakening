@@ -18,8 +18,8 @@ export function computeMissions(sessions: WorkoutSession[], settings: UserSettin
   const daily: Mission = restDay
     ? {
         id: 'daily',
-        title: 'Rest & recover',
-        description: doneToday > 0 ? 'Rest day — and you trained anyway.' : 'Rest day. Recovery is part of the path.',
+        title: 'Descansá y recuperate',
+        description: doneToday > 0 ? 'Día de descanso, y entrenaste igual.' : 'Día de descanso. Recuperarse también es parte del camino.',
         progress: doneToday > 0 ? 1 : 0,
         target: 1,
         completed: doneToday > 0,
@@ -27,8 +27,8 @@ export function computeMissions(sessions: WorkoutSession[], settings: UserSettin
       }
     : {
         id: 'daily',
-        title: 'Daily training',
-        description: 'Complete one strength or endurance session today.',
+        title: 'Entrenamiento diario',
+        description: 'Completá hoy una sesión de fuerza o de resistencia.',
         progress: Math.min(1, doneToday),
         target: 1,
         completed: doneToday > 0,
@@ -36,8 +36,8 @@ export function computeMissions(sessions: WorkoutSession[], settings: UserSettin
 
   const weekly: Mission = {
     id: 'weekly',
-    title: 'Weekly trial',
-    description: `Complete ${WEEKLY_TARGET} sessions this week (Mon–Sun).`,
+    title: 'Prueba semanal',
+    description: `Completá ${WEEKLY_TARGET} sesiones esta semana (lun–dom).`,
     progress: Math.min(WEEKLY_TARGET, thisWeek),
     target: WEEKLY_TARGET,
     completed: thisWeek >= WEEKLY_TARGET,

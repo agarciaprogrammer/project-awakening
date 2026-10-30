@@ -1,14 +1,36 @@
 import { isSameLocalWeek, localDateKey } from './dates';
-import { completedSetCount, isValidSession, strengthXp } from './progression';
+import { completedSetCount, isValidSession } from './progression';
 import type { WorkoutSession } from './types';
 
+/**
+ * Game attributes. Each one has its own level with a growing cost, so they keep
+ * progressing for months instead of capping out:
+ *   cost of level n → n+1 = step × n   (total to reach level n = step × n(n−1)/2)
+ * - Fuerza:      points = completed strength sets,   step = 10 sets
+ * - Resistencia: points = endurance minutes,          step = 30 min
+ * - Constancia:  points = distinct days with a valid session, step = 3 days
+ */
+export interface Attribute {
+  level: number;
+  points: number;
+  inLevel: number;
+  needed: number;
+}
+
 export interface CharacterStats {
-  /** STR = 1 + floor(total strength XP / 40). Rewards showing up for strength sessions. */
-  str: number;
-  /** END = 1 + floor(total treadmill minutes / 30). */
-  end: number;
-  /** VIT = 1 + floor(distinct local days with a valid session / 3). Regularity, never decreases. */
-  vit: number;
+  fuerza: Attribute;
+  resistencia: Attribute;
+  constancia: Attribute;
+}
+
+export function attributeFromPoints(points: number, step: number): Attribute {
+  let level = 1;
+  let rest = Math.max(0, Math.floor(points));
+  while (rest >= step * level) {
+    rest -= step * level;
+    level++;
+  }
+  return { level, points: Math.floor(points), inLevel: rest, needed: step * level };
 }
 
 export interface RealMetrics {
@@ -22,18 +44,18 @@ export interface RealMetrics {
 }
 
 export function computeStats(sessions: WorkoutSession[]): CharacterStats {
-  let strXp = 0;
+  let sets = 0;
   let minutes = 0;
   const days = new Set<string>();
   for (const s of sessions) {
-    if (s.type === 'strength') strXp += strengthXp(s.exercises);
+    if (s.type === 'strength') sets += completedSetCount(s.exercises);
     else minutes += Math.floor(s.treadmill.durationSec / 60);
     if (isValidSession(s)) days.add(localDateKey(s.endedAt));
   }
   return {
-    str: 1 + Math.floor(strXp / 40),
-    end: 1 + Math.floor(minutes / 30),
-    vit: 1 + Math.floor(days.size / 3),
+    fuerza: attributeFromPoints(sets, 10),
+    resistencia: attributeFromPoints(minutes, 30),
+    constancia: attributeFromPoints(days.size, 3),
   };
 }
 

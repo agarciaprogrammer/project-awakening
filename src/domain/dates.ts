@@ -38,7 +38,7 @@ export function formatDurationShort(totalSec: number): string {
 }
 
 export function formatDateTime(ts: number): string {
-  return new Date(ts).toLocaleString(undefined, {
+  return new Date(ts).toLocaleString('es-AR', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -48,15 +48,19 @@ export function formatDateTime(ts: number): string {
 }
 
 export function formatDate(ts: number): string {
-  return new Date(ts).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(ts).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export const WEEKDAYS_MON_FIRST: { day: number; short: string }[] = [
-  { day: 1, short: 'MON' },
-  { day: 2, short: 'TUE' },
-  { day: 3, short: 'WED' },
-  { day: 4, short: 'THU' },
-  { day: 5, short: 'FRI' },
-  { day: 6, short: 'SAT' },
-  { day: 0, short: 'SUN' },
+  { day: 1, short: 'LUN' },
+  { day: 2, short: 'MAR' },
+  { day: 3, short: 'MIÉ' },
+  { day: 4, short: 'JUE' },
+  { day: 5, short: 'VIE' },
+  { day: 6, short: 'SÁB' },
+  { day: 0, short: 'DOM' },
 ];
+
+export function formatNumber(n: number, decimals = 2): string {
+  return n.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}

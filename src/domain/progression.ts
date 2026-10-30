@@ -20,9 +20,13 @@ export function sessionXp(s: WorkoutSession): number {
   return s.type === 'strength' ? strengthXp(s.exercises) : treadmillXp(s.treadmill.durationSec);
 }
 
-/** XP needed to go from `level` to `level + 1`. */
+/**
+ * XP needed to go from `level` to `level + 1`: 40 + 12·√(level − 1), rounded.
+ * Cheap early levels (LV 2 after the first session), then it slowly flattens out.
+ * At ~5 sessions/week: LV 10 in ~3 weeks, LV 50 in ~6 months, LV 150 in ~2 years. No cap.
+ */
 export function xpForNextLevel(level: number): number {
-  return 100 + 20 * (level - 1);
+  return Math.round(40 + 12 * Math.sqrt(Math.max(0, level - 1)));
 }
 
 export function progressFromXp(totalXp: number): GameProgress {

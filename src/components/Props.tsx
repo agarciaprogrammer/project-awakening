@@ -15,6 +15,11 @@ export const PROPS: Record<string, string[]> = {
   vine: ['a..', 'aa.', '.a.', '.aa', '..a', '.aa', '.a.'],
   crystal: ['..c..', '.cac.', '.aaa.', 'caaac', 'aaaaa', '.aaa.', '..a..'],
   shard: ['.c.', 'cac', 'aaa', '.a.'],
+  tower: ['.c.c.c.', '.bbbbb.', '..bcb..', '..bbb..', '..bcb..', '..bbb..', '.bbbbb.', '.bb.bb.'],
+  banner: ['d....', 'dccc.', 'dcac.', 'dccc.', 'd.c..', 'd....', 'd....'],
+  flame: ['..c..', '.cc..', '.cac.', 'caaac', 'caaac', '.bbb.'],
+  snowpine: ['...c...', '..cac..', '..aaa..', '.caaac.', '.aaaaa.', 'caaaaac', '...d...', '...d...'],
+  icicle: ['ccccc', '.a.a.', '.a.a.', '...a.'],
   // creatures
   slime: ['..eeee..', '.eeeeee.', 'eeweewee', 'eeeeeeee', '.eeeeee.'],
   wisp: ['..e..', '.eee.', 'eewee', '.eee.', '..e..', '.e.e.'],
@@ -27,6 +32,9 @@ const THEME_PROPS: Record<ZoneTheme, { props: string[]; creature: string }> = {
   ruins: { props: ['pillar', 'arch', 'rock', 'pillar', 'rock', 'tuft'], creature: 'wisp' },
   overgrowth: { props: ['tree', 'pine', 'mushroom', 'vine', 'pine', 'mushroom'], creature: 'bat' },
   abyss: { props: ['crystal', 'shard', 'crystal', 'rock', 'shard', 'crystal'], creature: 'eye' },
+  frozen: { props: ['snowpine', 'icicle', 'shard', 'snowpine', 'rock', 'icicle'], creature: 'wisp' },
+  ember: { props: ['flame', 'rock', 'flame', 'shard', 'rock', 'flame'], creature: 'bat' },
+  citadel: { props: ['tower', 'banner', 'pillar', 'tower', 'banner', 'arch'], creature: 'eye' },
 };
 
 export function themePalette(accent: string, shade: string, dim: boolean): Palette {
@@ -34,18 +42,20 @@ export function themePalette(accent: string, shade: string, dim: boolean): Palet
   return { a: shade, b: '#4a4560', c: accent, d: '#3a2e2a', e: accent, w: '#e8e6f0', r: '#141018' };
 }
 
-// Slots along the edges, away from the node path.
-const SLOTS: [number, number][] = [
-  [3, 8], [104, 22], [2, 52], [106, 70], [4, 96], [103, 118],
-];
+// Slots along the edges, away from the node path (left/right alternating down the zone).
+function slot(i: number): [number, number] {
+  return [i % 2 === 0 ? 3 + (i % 3) : 104 - (i % 3), 8 + i * 22];
+}
 
-export function ZoneProps({ theme, palette }: { theme: ZoneTheme; palette: Palette }) {
+export function ZoneProps({ theme, palette, height }: { theme: ZoneTheme; palette: Palette; height: number }) {
   const set = THEME_PROPS[theme];
+  const count = Math.floor((height - 20) / 22);
   return (
     <g aria-hidden>
-      {set.props.map((p, i) => (
-        <PixelRects key={i} rows={PROPS[p]} palette={palette} x={SLOTS[i][0]} y={SLOTS[i][1]} />
-      ))}
+      {Array.from({ length: count }, (_, i) => {
+        const [x, y] = slot(i);
+        return <PixelRects key={i} rows={PROPS[set.props[i % set.props.length]]} palette={palette} x={x} y={y} />;
+      })}
     </g>
   );
 }

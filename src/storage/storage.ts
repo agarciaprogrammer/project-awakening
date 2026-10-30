@@ -39,16 +39,16 @@ function validSession(x: unknown): boolean {
 
 /** Structural validation; returns an error message or null. */
 export function validateState(x: unknown): string | null {
-  if (!isObj(x)) return 'Not a JSON object.';
-  if (x.version !== CURRENT_VERSION) return `Unsupported version: ${String(x.version)}.`;
-  if (!isObj(x.settings) || !Array.isArray(x.settings.restDays)) return 'Missing settings.';
-  if (!Array.isArray(x.exercises) || !x.exercises.every((e) => isObj(e) && isStr(e.id) && isStr(e.name))) return 'Invalid exercise list.';
-  if (!Array.isArray(x.routines) || x.routines.length === 0) return 'Missing routines.';
-  if (!x.routines.every((r) => isObj(r) && isStr(r.id) && isStr(r.name) && Array.isArray(r.exercises))) return 'Invalid routine.';
-  if (!isStr(x.activeRoutineId)) return 'Missing active routine.';
-  if (!Array.isArray(x.sessions) || !x.sessions.every(validSession)) return 'Invalid session history.';
+  if (!isObj(x)) return 'No es un objeto JSON.';
+  if (x.version !== CURRENT_VERSION) return `Versión no compatible: ${String(x.version)}.`;
+  if (!isObj(x.settings) || !Array.isArray(x.settings.restDays)) return 'Faltan los ajustes.';
+  if (!Array.isArray(x.exercises) || !x.exercises.every((e) => isObj(e) && isStr(e.id) && isStr(e.name))) return 'Lista de ejercicios inválida.';
+  if (!Array.isArray(x.routines) || x.routines.length === 0) return 'Faltan las rutinas.';
+  if (!x.routines.every((r) => isObj(r) && isStr(r.id) && isStr(r.name) && Array.isArray(r.exercises))) return 'Rutina inválida.';
+  if (!isStr(x.activeRoutineId)) return 'Falta la rutina activa.';
+  if (!Array.isArray(x.sessions) || !x.sessions.every(validSession)) return 'Historial de sesiones inválido.';
   if (x.activeSession !== null && !(isObj(x.activeSession) && isStr(x.activeSession.id) && isNum(x.activeSession.startedAt)))
-    return 'Invalid active session.';
+    return 'Sesión en curso inválida.';
   return null;
 }
 
@@ -109,7 +109,7 @@ export function parseBackup(text: string): { ok: true; state: AppState } | { ok:
   try {
     parsed = JSON.parse(text);
   } catch {
-    return { ok: false, error: 'File is not valid JSON.' };
+    return { ok: false, error: 'El archivo no es un JSON válido.' };
   }
   parsed = migrate(parsed);
   const err = validateState(parsed);

@@ -39,8 +39,9 @@ const SHOULDERS = [
   '............', '............', '............', '............', '............', '............',
   '.aa......aa.',
 ];
-const CIRCLET = ['............', '............', '...gggggg...']; // level 15
-const ABYSS_EYES = ['............', '............', '............', '...ses.es...']; // level 20 (eyes glow)
+const CIRCLET = ['............', '............', '...gggggg...']; // level 20
+const ABYSS_EYES = ['............', '............', '............', '...sxssxs...']; // level 45 (eyes glow)
+const CROWN = ['...g.gg.g...', '...gggggg...']; // level 100
 
 export const HERO_PALETTE: Palette = {
   h: '#a87a4f',
@@ -65,19 +66,31 @@ export function heroRows(level: number): string[] {
     underlays.push(CAPE_UNDER);
     overlays.push(SHOULDERS);
   }
-  if (level >= 15) overlays.push(CIRCLET);
-  const rows = composeGrid(BASE, overlays, underlays);
-  return level >= 20 ? composeGrid(rows, [ABYSS_EYES.map((r) => r.replace(/e/g, 'x'))]) : rows;
+  if (level >= 20) overlays.push(CIRCLET);
+  if (level >= 45) overlays.push(ABYSS_EYES);
+  if (level >= 100) overlays.push(CROWN);
+  return composeGrid(BASE, overlays, underlays);
 }
 
 export function heroPalette(level: number): Palette {
-  return level >= 20 ? { ...HERO_PALETTE, x: '#b794ff' } : HERO_PALETTE;
+  const p: Palette = { ...HERO_PALETTE, x: '#b794ff' };
+  if (level >= 30) Object.assign(p, { t: '#3b2f6a', d: '#8b6bff' }); // runic tunic
+  if (level >= 60) Object.assign(p, { c: '#8a2d3a' }); // crimson cape
+  if (level >= 150) Object.assign(p, { t: '#d8d0ff', d: '#b794ff', p: '#5a5280', c: '#f2c14e', x: '#ffffff' }); // awakened form
+  return p;
+}
+
+function auraClass(level: number): string {
+  if (level >= 150) return 'hero--aura hero--aura-awakened';
+  if (level >= 80) return 'hero--aura hero--aura-gold';
+  if (level >= 10) return 'hero--aura';
+  return '';
 }
 
 export function Hero({ level, className, animate = true }: { level: number; className?: string; animate?: boolean }) {
   return (
-    <div className={`hero ${level >= 10 ? 'hero--aura' : ''} ${animate ? 'hero--idle' : ''} ${className ?? ''}`}>
-      <PixelSprite rows={heroRows(level)} palette={heroPalette(level)} label={`Hero, level ${level}`} className="hero__sprite" />
+    <div className={`hero ${auraClass(level)} ${animate ? 'hero--idle' : ''} ${className ?? ''}`}>
+      <PixelSprite rows={heroRows(level)} palette={heroPalette(level)} label={`Héroe, nivel ${level}`} className="hero__sprite" />
     </div>
   );
 }
@@ -110,7 +123,7 @@ export function RestScene({ level }: { level: number }) {
     k: level >= 2 ? '#5b3fa6' : '#33405e',
   };
   return (
-    <div className="rest-scene" role="img" aria-label="Hero resting in bed">
+    <div className="rest-scene" role="img" aria-label="Héroe descansando en la cama">
       <svg viewBox="0 0 32 14" shapeRendering="crispEdges" className="rest-scene__bed" aria-hidden>
         <PixelRects rows={bed} palette={palette} />
       </svg>

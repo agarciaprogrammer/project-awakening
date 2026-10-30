@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { formatClock } from '../domain/dates';
+import { formatClock, formatNumber } from '../domain/dates';
 import { computeProgress, progressFromXp, treadmillXp } from '../domain/progression';
 import type { ActiveTreadmillSession } from '../domain/types';
 import { Hero } from '../components/Hero';
@@ -47,9 +47,9 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
   const after = progressFromXp(before.totalXp + xp);
 
   const save = () => {
-    if (durationSec <= 0) return setError('Enter how long the session lasted.');
-    if (parseInt(sec || '0', 10) > 59) return setError('Seconds must be 0–59.');
-    if (kmParsed === 'invalid') return setError('Distance must be a number like 3.56');
+    if (durationSec <= 0) return setError('Ingresá cuánto duró la sesión.');
+    if (parseInt(sec || '0', 10) > 59) return setError('Los segundos deben estar entre 0 y 59.');
+    if (kmParsed === 'invalid') return setError('La distancia debe ser un número, por ejemplo 3,56');
     setError(null);
     dispatch({ type: 'SAVE_TREADMILL', durationSec, distanceKm: kmParsed, note, now: Date.now() });
     onFinished(session.id, before.totalXp);
@@ -59,11 +59,11 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
     <div className="screen session">
       <header className="session__bar">
         <button type="button" className="btn btn--ghost btn--sm" onClick={onBack}>
-          ‹ Home
+          ‹ Inicio
         </button>
-        <span className="eyebrow">Endurance</span>
+        <span className="eyebrow">Resistencia</span>
         <button type="button" className="btn btn--ghost btn--sm btn--danger-text" onClick={() => setConfirmCancel(true)}>
-          Cancel
+          Cancelar
         </button>
       </header>
 
@@ -76,12 +76,12 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
           <p className="timer timer--xl" aria-live="off">
             {formatClock(elapsed)}
           </p>
-          <p className="muted center">+{treadmillXp(elapsed)} XP so far · 1 XP per minute, max 50</p>
+          <p className="muted center">+{treadmillXp(elapsed)} XP hasta ahora · 1 XP por minuto, máx. 50</p>
           <button type="button" className="btn btn--primary btn--lg btn--block" onClick={() => stop(false)}>
-            FINISH SESSION
+            TERMINAR SESIÓN
           </button>
           <button type="button" className="btn btn--ghost btn--block" onClick={() => stop(true)}>
-            Forgot the timer? Log manually
+            ¿Olvidaste el cronómetro? Cargar a mano
           </button>
         </div>
       ) : (
@@ -92,42 +92,42 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
             save();
           }}
         >
-          <h2 className="section-title">Log your session</h2>
+          <h2 className="section-title">Registrá tu sesión</h2>
           <label className="field">
-            <span className="field__label">Duration</span>
+            <span className="field__label">Duración</span>
             <span className="duration">
-              <input className="input input--num" inputMode="numeric" pattern="[0-9]*" aria-label="Minutes" value={min} onChange={(e) => setMin(e.target.value.replace(/\D/g, '').slice(0, 3))} />
+              <input className="input input--num" inputMode="numeric" pattern="[0-9]*" aria-label="Minutos" value={min} onChange={(e) => setMin(e.target.value.replace(/\D/g, '').slice(0, 3))} />
               <span>min</span>
-              <input className="input input--num" inputMode="numeric" pattern="[0-9]*" aria-label="Seconds" value={sec} onChange={(e) => setSec(e.target.value.replace(/\D/g, '').slice(0, 2))} />
-              <span>sec</span>
+              <input className="input input--num" inputMode="numeric" pattern="[0-9]*" aria-label="Segundos" value={sec} onChange={(e) => setSec(e.target.value.replace(/\D/g, '').slice(0, 2))} />
+              <span>seg</span>
             </span>
           </label>
           <label className="field">
-            <span className="field__label">Distance (km)</span>
-            <input className="input" inputMode="decimal" placeholder="e.g. 3.56" value={km} onChange={(e) => setKm(e.target.value)} />
+            <span className="field__label">Distancia (km)</span>
+            <input className="input" inputMode="decimal" placeholder="ej. 3,56" value={km} onChange={(e) => setKm(e.target.value)} />
           </label>
           <label className="field">
-            <span className="field__label">Note (optional)</span>
+            <span className="field__label">Nota (opcional)</span>
             <textarea className="input" rows={2} maxLength={280} value={note} onChange={(e) => setNote(e.target.value)} />
           </label>
           <dl className="summary">
-            <dt>Avg speed</dt>
-            <dd>{speed ? `${speed.toFixed(2)} km/h` : '—'}</dd>
-            <dt>XP earned</dt>
+            <dt>Velocidad media</dt>
+            <dd>{speed ? `${formatNumber(speed)} km/h` : '—'}</dd>
+            <dt>XP obtenida</dt>
             <dd className="accent">+{xp}</dd>
             {after.level > before.level && (
               <>
-                <dt>New level</dt>
+                <dt>Nuevo nivel</dt>
                 <dd className="gold">LV {after.level}</dd>
               </>
             )}
           </dl>
           {error && <p className="warn" role="alert">{error}</p>}
           <button type="submit" className="btn btn--primary btn--lg btn--block">
-            SAVE SESSION
+            GUARDAR SESIÓN
           </button>
           <button type="button" className="btn btn--ghost btn--block" onClick={() => dispatch({ type: 'RESUME_TREADMILL' })}>
-            Back to timer
+            Volver al cronómetro
           </button>
         </form>
       )}
@@ -135,9 +135,9 @@ export function TreadmillSession({ session, onBack, onFinished }: { session: Act
       <Confirm
         open={confirmCancel}
         danger
-        title="Abandon session?"
-        body="This session will be discarded and won’t appear in your history."
-        confirmLabel="Discard"
+        title="¿Abandonar sesión?"
+        body="Esta sesión se descartará y no aparecerá en tu historial."
+        confirmLabel="Descartar"
         onCancel={() => setConfirmCancel(false)}
         onConfirm={() => {
           setConfirmCancel(false);

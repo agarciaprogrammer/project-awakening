@@ -8,9 +8,9 @@ import { creatureFor, themePalette, ZoneProps } from '../components/Props';
 import { useStore } from '../state/store';
 
 const W = 120;
-const H = 150;
-const NODE_X = [34, 86, 40, 82, 60];
-const NODE_Y = [26, 52, 78, 104, 130];
+const NODE_X = [34, 86, 40, 82, 60, 30, 88, 44, 80, 60];
+const NODE_Y = NODE_X.map((_, i) => 26 + i * 26);
+const H = NODE_Y[NODE_Y.length - 1] + 20;
 
 function orth(ax: number, ay: number, bx: number, by: number) {
   const my = Math.round((ay + by) / 2);
@@ -23,33 +23,34 @@ function ZoneSection({ zone, level }: { zone: Zone; level: number }) {
   const creature = creatureFor(zone.theme);
   let path = orth(60, 0, NODE_X[0], NODE_Y[0]);
   for (let i = 1; i < LEVELS_PER_ZONE; i++) path += orth(NODE_X[i - 1], NODE_Y[i - 1], NODE_X[i], NODE_Y[i]).replace('M', ' M');
-  path += orth(NODE_X[4], NODE_Y[4], 60, H).replace('M', ' M');
+  path += orth(NODE_X[LEVELS_PER_ZONE - 1], NODE_Y[LEVELS_PER_ZONE - 1], 60, H).replace('M', ' M');
   const walkedTo = Math.min(LEVELS_PER_ZONE, Math.max(0, level - zone.firstLevel + 1));
 
   return (
     <section className={`zone ${unlocked ? '' : 'zone--locked'}`} style={{ ['--zone-accent' as string]: zone.colors.accent, background: unlocked ? zone.colors.sky : '#0a0a10' }}>
       <header className="zone__head">
-        <span className="tag">ZONE {zoneNumeral(zone.index)}</span>
+        <span className="tag">ZONA {zoneNumeral(zone.index)}</span>
         <h2 className="zone__name">{unlocked ? zone.name : '???'}</h2>
         <span className="zone__range">
           {unlocked ? `LV ${zone.firstLevel}–${zone.lastLevel}` : (
             <>
-              <Icon name="lock" /> Opens at LV {zone.firstLevel}
+              <Icon name="lock" /> Se abre en LV {zone.firstLevel}
             </>
           )}
         </span>
       </header>
-      <svg viewBox={`0 0 ${W} ${H}`} shapeRendering="crispEdges" className="zone__svg" role="img" aria-label={`${zone.name} map, levels ${zone.firstLevel} to ${zone.lastLevel}`}>
+      <svg viewBox={`0 0 ${W} ${H}`} shapeRendering="crispEdges" className="zone__svg" role="img" aria-label={`Mapa de ${zone.name}, niveles ${zone.firstLevel} a ${zone.lastLevel}`}>
         {/* ground texture */}
-        {Array.from({ length: 40 }, (_, i) => (
+        {Array.from({ length: 70 }, (_, i) => (
           <rect key={i} x={(i * 37) % W} y={(i * 53) % H} width={2} height={1} fill={unlocked ? zone.colors.ground : '#111118'} />
         ))}
-        <ZoneProps theme={zone.theme} palette={pal} />
+        <ZoneProps theme={zone.theme} palette={pal} height={H} />
         <path d={path} fill="none" stroke={unlocked ? zone.colors.shade : '#1a1a24'} strokeWidth={4} />
         <path d={path} fill="none" stroke={unlocked ? zone.colors.accent : '#2a2a38'} strokeWidth={1} strokeDasharray="2 2" opacity={unlocked ? 0.55 : 1} />
         {/* ambient creature — decoration only */}
         <g className={unlocked ? 'creature' : ''} opacity={unlocked ? 0.9 : 0.35}>
           <PixelRects rows={creature} palette={pal} x={52} y={56} />
+          <PixelRects rows={creature} palette={pal} x={56} y={186} />
         </g>
         {NODE_X.map((x, i) => {
           const lv = zone.firstLevel + i;
@@ -64,7 +65,7 @@ function ZoneSection({ zone, level }: { zone: Zone; level: number }) {
               <text x={x} y={NODE_Y[i] + 2.2} textAnchor="middle" className="node__label" fill={state === 'locked' ? '#4a4a5e' : '#0b0b12'}>
                 {lv}
               </text>
-              <title>{`Level ${lv}${state === 'done' ? ' — cleared' : state === 'current' ? ' — you are here' : ' — locked'}`}</title>
+              <title>{`Nivel ${lv}${state === 'done' ? ' — superado' : state === 'current' ? ' — estás aquí' : ' — bloqueado'}`}</title>
             </g>
           );
         })}
@@ -82,7 +83,8 @@ export function MapScreen() {
   const { state } = useStore();
   const { level } = computeProgress(state.sessions);
   const currentZone = zoneIndexForLevel(level);
-  const count = Math.max(4, currentZone + 2);
+  // Show every reached zone plus the next one as a locked silhouette.
+  const count = currentZone + 2;
   useEffect(() => {
     document.getElementById('map-current')?.scrollIntoView({ block: 'center' });
   }, []);
@@ -90,16 +92,15 @@ export function MapScreen() {
     <div className="screen map">
       <header className="topbar">
         <div>
-          <p className="eyebrow">World map</p>
-          <h1 className="logo">THE DESCENT</h1>
+          <p className="eyebrow">Mapa del mundo</p>
+          <h1 className="logo">EL DESCENSO</h1>
         </div>
         <span className="tag tag--gold">LV {level}</span>
       </header>
-      <p className="muted small">Each level you reach clears a stage. Train to push deeper.</p>
+      <p className="muted small">Cada nivel que alcanzás supera una etapa. Entrená para avanzar más profundo.</p>
       {Array.from({ length: count }, (_, i) => (
         <ZoneSection key={i} zone={getZone(i)} level={level} />
       ))}
-      <p className="map__end muted small center">Beyond lies darkness not yet charted…</p>
     </div>
   );
 }

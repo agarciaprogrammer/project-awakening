@@ -20,7 +20,7 @@ function previousValues(sessions: WorkoutSession[], exerciseId: string): (number
 function targetLabel(l: StrengthExerciseLog) {
   const unit = l.mode === 'seconds' ? 's' : ' reps';
   const range = l.targetMin === l.targetMax ? `${l.targetMin}` : `${l.targetMin}–${l.targetMax}`;
-  return `${range}${unit}${l.perSide ? ' / side' : ''}`;
+  return `${range}${unit}${l.perSide ? ' / lado' : ''}`;
 }
 
 export function StrengthSession({ session, onBack, onFinished }: { session: ActiveStrengthSession; onBack: () => void; onFinished: (id: string, beforeXp: number) => void }) {
@@ -46,25 +46,25 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
     <div className="screen session">
       <header className="session__bar">
         <button type="button" className="btn btn--ghost btn--sm" onClick={onBack}>
-          ‹ Home
+          ‹ Inicio
         </button>
         <div className="session__timer" aria-live="off">
-          <span className="eyebrow">Strength</span>
+          <span className="eyebrow">Fuerza</span>
           <span className="timer">{formatClock(elapsed)}</span>
         </div>
         <button type="button" className="btn btn--ghost btn--sm btn--danger-text" onClick={() => setConfirmCancel(true)}>
-          Cancel
+          Cancelar
         </button>
       </header>
       <p className="session__routine">{session.routineName}</p>
 
       {session.exercises.length === 0 && (
-        <p className="empty">This routine has no exercises. Add some in Settings — or cancel this session.</p>
+        <p className="empty">Esta rutina no tiene ejercicios. Agregá algunos en Ajustes, o cancelá la sesión.</p>
       )}
 
       {session.exercises.map((log, idx) => {
         const prev = previousValues(state.sessions, log.exerciseId);
-        const unit = log.mode === 'seconds' ? 'SEC' : 'REPS';
+        const unit = log.mode === 'seconds' ? 'SEG' : 'REPS';
         const done = log.sets.filter((s) => s.completed).length;
         return (
           <article key={log.id} className={`exercise ${done > 0 ? 'exercise--active' : ''}`}>
@@ -72,7 +72,7 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
               <span className="exercise__num">{idx + 1}</span>
               <div>
                 <h3 className="exercise__name">{log.name}</h3>
-                <p className="exercise__target">Target {targetLabel(log)}</p>
+                <p className="exercise__target">Objetivo {targetLabel(log)}</p>
               </div>
               <span className="exercise__done">
                 {done}/{log.sets.length}
@@ -80,17 +80,17 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
             </header>
             <div className="sets">
               <div className="sets__row sets__row--head">
-                <span>SET</span>
-                <span>PREV</span>
+                <span>SERIE</span>
+                <span>ANT</span>
                 <span>{unit}</span>
-                <span className="sr-only">Done</span>
+                <span className="sr-only">Hecha</span>
               </div>
               {log.sets.map((set, i) => (
                 <div key={set.id} className={`sets__row ${set.completed ? 'sets__row--done' : ''}`}>
                   <span className="sets__n">
                     {i + 1}
                     {i >= 1 && !set.completed && log.sets.length > 1 && (
-                      <button type="button" className="sets__rm" aria-label={`Remove set ${i + 1}`} onClick={() => dispatch({ type: 'REMOVE_SET', logId: log.id, setId: set.id })}>
+                      <button type="button" className="sets__rm" aria-label={`Quitar serie ${i + 1}`} onClick={() => dispatch({ type: 'REMOVE_SET', logId: log.id, setId: set.id })}>
                         <Icon name="close" />
                       </button>
                     )}
@@ -101,7 +101,7 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
                     inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder={`${log.targetMin}-${log.targetMax}`}
-                    aria-label={`${log.name} set ${i + 1} ${unit.toLowerCase()}`}
+                    aria-label={`${log.name} serie ${i + 1} ${unit.toLowerCase()}`}
                     value={set.value ?? ''}
                     onChange={(e) => {
                       const digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
@@ -112,7 +112,7 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
                     type="button"
                     className={`check ${set.completed ? 'check--on' : ''}`}
                     aria-pressed={set.completed}
-                    aria-label={set.completed ? `Undo set ${i + 1}` : `Complete set ${i + 1}`}
+                    aria-label={set.completed ? `Deshacer serie ${i + 1}` : `Completar serie ${i + 1}`}
                     disabled={!set.completed && !(set.value && set.value > 0)}
                     onClick={() => dispatch({ type: 'TOGGLE_SET', logId: log.id, setId: set.id })}
                   >
@@ -122,7 +122,7 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
               ))}
             </div>
             <button type="button" className="btn btn--ghost btn--sm btn--block" onClick={() => dispatch({ type: 'ADD_SET', logId: log.id })}>
-              + Add set
+              + Agregar serie
             </button>
           </article>
         );
@@ -130,50 +130,50 @@ export function StrengthSession({ session, onBack, onFinished }: { session: Acti
 
       <div className="session__footer">
         <div className="session__tally">
-          <span>{exercises} exercises</span>
-          <span>{sets} sets</span>
+          <span>{exercises} ejercicios</span>
+          <span>{sets} series</span>
           <span className="accent">+{xp} XP</span>
         </div>
         <button type="button" className="btn btn--primary btn--lg btn--block" onClick={() => setConfirmFinish(true)}>
-          FINISH
+          TERMINAR
         </button>
       </div>
 
       <Confirm
         open={confirmFinish}
-        title="Finish training?"
-        confirmLabel="Save session"
-        cancelLabel="Keep going"
+        title="¿Terminar entrenamiento?"
+        confirmLabel="Guardar sesión"
+        cancelLabel="Seguir"
         onCancel={() => setConfirmFinish(false)}
         onConfirm={finish}
         body={
           <>
             <dl className="summary">
-              <dt>Duration</dt>
+              <dt>Duración</dt>
               <dd>{formatClock(elapsed)}</dd>
-              <dt>Exercises completed</dt>
+              <dt>Ejercicios completados</dt>
               <dd>{exercises}</dd>
-              <dt>Sets completed</dt>
+              <dt>Series completadas</dt>
               <dd>{sets}</dd>
-              <dt>XP earned</dt>
+              <dt>XP obtenida</dt>
               <dd className="accent">+{xp}</dd>
               {after.level > before.level && (
                 <>
-                  <dt>New level</dt>
+                  <dt>Nuevo nivel</dt>
                   <dd className="gold">LV {after.level}</dd>
                 </>
               )}
             </dl>
-            {sets === 0 && <p className="warn">No sets were marked complete. The session will be saved with 0 XP.</p>}
+            {sets === 0 && <p className="warn">No marcaste ninguna serie como completada. La sesión se guardará con 0 XP.</p>}
           </>
         }
       />
       <Confirm
         open={confirmCancel}
         danger
-        title="Abandon session?"
-        body="This session will be discarded and won’t appear in your history."
-        confirmLabel="Discard"
+        title="¿Abandonar sesión?"
+        body="Esta sesión se descartará y no aparecerá en tu historial."
+        confirmLabel="Descartar"
         onCancel={() => setConfirmCancel(false)}
         onConfirm={() => {
           setConfirmCancel(false);

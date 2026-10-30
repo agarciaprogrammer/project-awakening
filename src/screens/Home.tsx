@@ -3,11 +3,11 @@ import { formatClock, formatDateTime } from '../domain/dates';
 import { computeMissions } from '../domain/missions';
 import { computeProgress } from '../domain/progression';
 import { computeMetrics, computeStats } from '../domain/stats';
-import { nextCosmeticUnlock, titleForLevel } from '../domain/unlocks';
+import { nextUnlock, titleForLevel } from '../domain/unlocks';
 import { zoneForLevel, zoneNumeral } from '../domain/zones';
 import { Hero, RestScene } from '../components/Hero';
 import { Icon } from '../components/Icons';
-import { IconButton, Panel, Sheet, StatPips, XpBar } from '../components/ui';
+import { IconButton, Panel, Sheet, AttributeRow, XpBar } from '../components/ui';
 import { useNow } from '../hooks/useNow';
 import { useStore } from '../state/store';
 
@@ -21,17 +21,16 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
   const { daily, weekly, restDay } = computeMissions(state.sessions, state.settings, now);
   const stats = computeStats(state.sessions);
   const metrics = computeMetrics(state.sessions, now);
-  const next = nextCosmeticUnlock(progress.level);
+  const next = nextUnlock(progress.level);
   const active = state.activeSession;
 
   return (
     <div className="screen home">
       <header className="topbar">
         <div>
-          <p className="eyebrow">System online</p>
           <h1 className="logo">PROJECT AWAKENING</h1>
         </div>
-        <IconButton icon="gear" label="Settings" onClick={onSettings} />
+        <IconButton icon="gear" label="Ajustes" onClick={onSettings} />
       </header>
 
       <section className="hero-card" style={{ ['--zone-accent' as string]: zone.colors.accent, ['--zone-sky' as string]: zone.colors.sky }}>
@@ -49,28 +48,28 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
             {progress.xpInLevel} / {progress.xpForNext} XP
           </p>
           <p className="hero-card__zone">
-            <span className="tag">ZONE {zoneNumeral(zone.index)}</span> {zone.name} · Stage {zone.index + 1}-{stage}
+            <span className="tag">ZONA {zoneNumeral(zone.index)}</span> {zone.name} · Etapa {zone.index + 1}-{stage}
           </p>
-          {next && <p className="muted small">Next reward at LV {next.level}: {next.name}</p>}
+          {next && <p className="muted small">Próxima recompensa en LV {next.level}: {next.name}</p>}
         </div>
       </section>
 
       {active ? (
         <button type="button" className="train-btn train-btn--resume" onClick={onResume}>
-          <span className="train-btn__label">RESUME</span>
+          <span className="train-btn__label">RETOMAR</span>
           <span className="train-btn__sub">
-            {active.type === 'strength' ? 'Strength' : 'Endurance'} in progress ·{' '}
+            {active.type === 'strength' ? 'Fuerza' : 'Resistencia'} en curso ·{' '}
             {formatClock(((active.type === 'treadmill' && active.stoppedAt ? active.stoppedAt : now) - active.startedAt) / 1000)}
           </span>
         </button>
       ) : (
         <button type="button" className="train-btn" onClick={() => setPicker(true)}>
-          <span className="train-btn__label">TRAIN</span>
-          <span className="train-btn__sub">{restDay ? 'Rest day — training is optional' : 'Begin a session'}</span>
+          <span className="train-btn__label">ENTRENAR</span>
+          <span className="train-btn__sub">{restDay ? 'Día de descanso — entrenar es opcional' : 'Comenzar una sesión'}</span>
         </button>
       )}
 
-      <Panel title="Missions">
+      <Panel title="Misiones">
         <div className={`mission ${daily.completed ? 'mission--done' : ''} ${daily.resting ? 'mission--rest' : ''}`}>
           <span className="mission__icon">
             <Icon name={daily.resting && !daily.completed ? 'moon' : daily.completed ? 'check' : 'star'} />
@@ -79,7 +78,7 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
             <strong>{daily.title}</strong>
             <span>{daily.description}</span>
           </div>
-          <span className="mission__count">{daily.resting && !daily.completed ? 'REST' : `${daily.progress}/${daily.target}`}</span>
+          <span className="mission__count">{daily.resting && !daily.completed ? 'DESCANSO' : `${daily.progress}/${daily.target}`}</span>
         </div>
         <div className={`mission ${weekly.completed ? 'mission--done' : ''}`}>
           <span className="mission__icon">
@@ -87,7 +86,7 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
           </span>
           <div className="mission__text">
             <strong>{weekly.title}</strong>
-            <span>{weekly.completed ? 'Trial cleared. Badge earned this week.' : weekly.description}</span>
+            <span>{weekly.completed ? '¡Prueba superada! Insignia ganada esta semana.' : weekly.description}</span>
             <span className="weekly-pips" aria-hidden>
               {Array.from({ length: weekly.target }, (_, i) => (
                 <span key={i} className={i < weekly.progress ? 'pip pip--on pip--lg' : 'pip pip--lg'} />
@@ -95,23 +94,21 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
             </span>
           </div>
           <span className="mission__count">
-            {weekly.completed ? <span className="badge">CLEARED</span> : `${weekly.progress}/${weekly.target}`}
+            {weekly.completed ? <span className="badge">SUPERADA</span> : `${weekly.progress}/${weekly.target}`}
           </span>
         </div>
       </Panel>
 
-      <Panel title="Attributes">
-        <div className="stats-row">
-          <StatPips label="STR" value={stats.str} hint="Strength: grows with strength-session XP" />
-          <StatPips label="END" value={stats.end} hint="Endurance: grows with endurance minutes" />
-          <StatPips label="VIT" value={stats.vit} hint="Vitality: grows with the number of days you train" />
-        </div>
+      <Panel title="Atributos">
+        <AttributeRow name="Fuerza" {...stats.fuerza} unit="series" />
+        <AttributeRow name="Resistencia" {...stats.resistencia} unit="min" />
+        <AttributeRow name="Constancia" {...stats.constancia} unit="días" />
         <p className="muted small">
-          {metrics.lastActivityAt ? `Last activity: ${formatDateTime(metrics.lastActivityAt)}` : 'No activity yet. Your journey starts with one session.'}
+          {metrics.lastActivityAt ? `Última actividad: ${formatDateTime(metrics.lastActivityAt)}` : 'Sin actividad todavía. Tu camino empieza con una sesión.'}
         </p>
       </Panel>
 
-      <Sheet open={picker} onClose={() => setPicker(false)} title="Choose your training">
+      <Sheet open={picker} onClose={() => setPicker(false)} title="Elegí tu entrenamiento">
         <div className="picker">
           <button
             type="button"
@@ -122,8 +119,8 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
             }}
           >
             <Icon name="fist" />
-            <span className="picker__name">STRENGTH</span>
-            <span className="picker__desc">{state.routines.find((r) => r.id === state.activeRoutineId)?.name ?? 'Routine'}</span>
+            <span className="picker__name">FUERZA</span>
+            <span className="picker__desc">{state.routines.find((r) => r.id === state.activeRoutineId)?.name ?? 'Rutina'}</span>
           </button>
           <button
             type="button"
@@ -134,8 +131,8 @@ export function Home({ onStart, onResume, onSettings }: { onStart: (kind: 'stren
             }}
           >
             <Icon name="boot" />
-            <span className="picker__name">ENDURANCE</span>
-            <span className="picker__desc">Treadmill · walk or run</span>
+            <span className="picker__name">RESISTENCIA</span>
+            <span className="picker__desc">Cinta · caminar o correr</span>
           </button>
         </div>
       </Sheet>

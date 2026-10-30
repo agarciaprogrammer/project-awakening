@@ -5,7 +5,7 @@ export function XpBar({ value, max, label, segments = 20 }: { value: number; max
   const pct = max > 0 ? Math.min(1, value / max) : 0;
   const filled = Math.round(pct * segments);
   return (
-    <div className="xpbar" role="progressbar" aria-valuemin={0} aria-valuemax={max} aria-valuenow={value} aria-label={label ?? 'Experience'}>
+    <div className="xpbar" role="progressbar" aria-valuemin={0} aria-valuemax={max} aria-valuenow={value} aria-label={label ?? 'Experiencia'}>
       {Array.from({ length: segments }, (_, i) => (
         <span key={i} className={i < filled ? 'xpbar__seg xpbar__seg--on' : 'xpbar__seg'} />
       ))}
@@ -70,7 +70,7 @@ export function Confirm({
   title,
   body,
   confirmLabel,
-  cancelLabel = 'Back',
+  cancelLabel = 'Volver',
   danger,
   onConfirm,
   onCancel,
@@ -139,20 +139,17 @@ export function NumField({
   );
 }
 
-export function StatPips({ label, value, hint }: { label: string; value: number; hint: string }) {
-  const pips = ((value - 1) % 10) + 1;
+export function AttributeRow({ name, level, inLevel, needed, unit }: { name: string; level: number; inLevel: number; needed: number; unit: string }) {
   return (
-    <div className="stat" title={hint}>
-      <div className="stat__top">
-        <span className="stat__label">{label}</span>
-        <span className="stat__value">{value}</span>
+    <div className="attr">
+      <div className="attr__top">
+        <span className="attr__name">{name}</span>
+        <span className="attr__lv">LV {level}</span>
       </div>
-      <div className="stat__pips" aria-hidden>
-        {Array.from({ length: 10 }, (_, i) => (
-          <span key={i} className={i < pips ? 'pip pip--on' : 'pip'} />
-        ))}
-      </div>
-      <span className="sr-only">{hint}</span>
+      <XpBar value={inLevel} max={needed} label={`${name}: ${inLevel} de ${needed} ${unit}`} segments={12} />
+      <p className="attr__hint">
+        {inLevel}/{needed} {unit}
+      </p>
     </div>
   );
 }

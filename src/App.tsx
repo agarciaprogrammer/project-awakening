@@ -11,9 +11,9 @@ import { useStore } from './state/store';
 
 type Tab = 'home' | 'map' | 'history';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
-  { id: 'home', label: 'Home', icon: 'home' },
-  { id: 'map', label: 'Map', icon: 'map' },
-  { id: 'history', label: 'History', icon: 'scroll' },
+  { id: 'home', label: 'Inicio', icon: 'home' },
+  { id: 'map', label: 'Mapa', icon: 'map' },
+  { id: 'history', label: 'Historial', icon: 'scroll' },
 ];
 
 export function App() {
@@ -67,7 +67,7 @@ export function App() {
         )}
         {tab === 'map' && <MapScreen />}
         {tab === 'history' && <History />}
-        <nav className="nav" aria-label="Main">
+        <nav className="nav" aria-label="Principal">
           {TABS.map((t) => (
             <button key={t.id} type="button" className={`nav__btn ${tab === t.id ? 'nav__btn--on' : ''}`} aria-current={tab === t.id ? 'page' : undefined} onClick={() => setTab(t.id)}>
               <Icon name={t.icon} />
